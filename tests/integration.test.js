@@ -1,4 +1,5 @@
 import { initGame, __testHooks, SAVE_STORAGE_KEY } from '../game.js';
+import { renderCasePopup, hideCasePopup } from '../cases.js';
 import { test, assert, equal, includes, wait } from './test-utils.js';
 
 function clone(value) {
@@ -303,4 +304,31 @@ test('Finishing the last scenario displays the final score and grade.', async ()
   equal(document.getElementById('end-total-score').textContent, '10');
   equal(document.getElementById('end-percentage').textContent, '100%');
   equal(document.querySelector('#end-grade-badge .grade-letter').textContent, 'A');
+});
+
+
+test('Case popup shows citation cleanly when a reference has no decision year.', async () => {
+  prepareEnvironment();
+
+  const anchorButton = document.createElement('button');
+  anchorButton.type = 'button';
+  anchorButton.textContent = 'Open reference';
+  document.body.appendChild(anchorButton);
+
+  const popup = renderCasePopup({
+    id: 'federal-preemption-framework',
+    name: 'Federal Preemption Framework (Supremacy Clause, Article VI)',
+    year: null,
+    citation: 'U.S. Const. art. VI, cl. 2',
+    holding: 'Federal law preempts state law when Congress intends it.',
+    significance: 'Constitutional authority entries should still render cleanly in the popup.',
+    doctrineAreas: ['Federal Preemption'],
+    keyQuote: ''
+  }, anchorButton);
+
+  assert(popup, 'Expected case popup to render for reference data.');
+  equal(popup.querySelector('.case-popup-year').textContent, 'U.S. Const. art. VI, cl. 2');
+
+  hideCasePopup();
+  anchorButton.remove();
 });
